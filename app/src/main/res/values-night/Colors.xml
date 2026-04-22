@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Widget text colors (dark mode) -->
+    <color name="widget_text_primary">#FFE0E0E0</color>
+    <color name="widget_text_secondary">#FFCCCCCC</color>
+    <color name="widget_text_label">#FFBDBDBD</color>
+    <color name="widget_streak_active">#FFFFAB40</color>
+    <color name="widget_streak_inactive">#FF9E9E9E</color>
+</resources>
