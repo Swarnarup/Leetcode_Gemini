@@ -3,8 +3,10 @@ package com.example.leetcode_gemini
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.BitmapFactory
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,12 +55,13 @@ class LeetCodeWidget : GlanceAppWidget() {
         }
 
         val bgDrawable = if (dailyDone) R.drawable.widget_bg_completed else R.drawable.widget_bg_pending
-        val flameIcon = if (dailyDone) R.drawable.fire_vivid else R.drawable.fire_non_animated_dim
+        val flameIcon = if (dailyDone) R.drawable.new_fire else R.drawable.fire_non_animated_dim
         val flameDesc = if (dailyDone) "Daily completed" else "Daily pending"
 
         provideContent {
             val size = LocalSize.current
             when {
+                size.width < 80.dp -> ExtraSmallLayout(bgDrawable, avatarBitmap, flameIcon, flameDesc)
                 size.width < 120.dp -> SmallLayout(bgDrawable, avatarBitmap, flameIcon, flameDesc)
                 size.height < 200.dp -> MediumLayout(bgDrawable, avatarBitmap, name, flameIcon, flameDesc, streak, dailyDone)
                 else -> LargeLayout(bgDrawable, avatarBitmap, name, daily, flameIcon, flameDesc, streak, dailyDone)
@@ -66,9 +69,8 @@ class LeetCodeWidget : GlanceAppWidget() {
         }
     }
 }
-
 @Composable
-private fun SmallLayout(
+private fun ExtraSmallLayout(
     bgDrawable: Int,
     avatarBitmap: android.graphics.Bitmap?,
     flameIcon: Int,
@@ -76,13 +78,99 @@ private fun SmallLayout(
 ) {
     Box(
         modifier = GlanceModifier.fillMaxSize()
+            .padding(horizontal = 2.dp)
             .background(ImageProvider(bgDrawable)),
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            modifier = GlanceModifier.padding(8.dp),
+        Row(
+//            modifier = GlanceModifier.padding(1.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (avatarBitmap != null) {
+                Image(
+                    provider = ImageProvider(avatarBitmap),
+                    contentDescription = "Avatar",
+                    modifier = GlanceModifier.size(40.dp).cornerRadius(24.dp)
+                )
+            } else {
+                Box(
+                    modifier = GlanceModifier.size(48.dp)
+                        .background(Color(0xFF9E9E9E))
+                        .cornerRadius(24.dp)
+                ) {}
+            }
+            Spacer(GlanceModifier.width(2.dp))
+            Image(
+                provider = ImageProvider(flameIcon),
+                contentDescription = flameDesc,
+                modifier = GlanceModifier.size(60.dp)
+            )
+        }
+    }
+}
+@Composable
+private fun SmallLayout(
+    bgDrawable: Int,
+    avatarBitmap: android.graphics.Bitmap?,
+    flameIcon: Int,
+    flameDesc: String
+) {
+    Row(
+        modifier = GlanceModifier.fillMaxSize()
+        .padding(horizontal = 5.dp)
+        .background(ImageProvider(bgDrawable)),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(modifier = GlanceModifier.defaultWeight().padding(6.dp),
+            contentAlignment = Alignment.Center) {
+            if (avatarBitmap != null) {
+                Image(
+                    provider = ImageProvider(avatarBitmap),
+                    contentDescription = "Avatar",
+//                    modifier = GlanceModifier.size(60.dp).cornerRadius(30.dp)
+                    modifier = GlanceModifier.fillMaxSize().cornerRadius((minOf(LocalSize.current.height, LocalSize.current.height))/2)
+                )
+            } else {
+                Box(
+                    modifier = GlanceModifier.fillMaxSize()
+                        .background(Color(0xFF9E9E9E))
+                        .cornerRadius(minOf(LocalSize.current.height, LocalSize.current.height)/2)
+                ) {}
+            }
+        }
+        Box(modifier = GlanceModifier.defaultWeight().padding(4.dp),
+            contentAlignment = Alignment.Center)
+        {
+            Image(
+                provider = ImageProvider(flameIcon),
+                contentDescription = flameDesc,
+//                modifier = GlanceModifier.size(80.dp)
+                modifier = GlanceModifier.fillMaxSize()
+            )
+        }
+    }
+}
+@Composable
+private fun MediumLayout(
+    bgDrawable: Int,
+    avatarBitmap: android.graphics.Bitmap?,
+    name: String,
+    flameIcon: Int,
+    flameDesc: String,
+    streak: Int,
+    dailyDone: Boolean
+) {
+    Row(
+        modifier = GlanceModifier.fillMaxSize()
+            .background(ImageProvider(bgDrawable)),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = GlanceModifier.defaultWeight()
         ) {
             if (avatarBitmap != null) {
                 Image(
@@ -97,64 +185,28 @@ private fun SmallLayout(
                         .cornerRadius(24.dp)
                 ) {}
             }
-            Spacer(GlanceModifier.height(6.dp))
-            Image(
-                provider = ImageProvider(flameIcon),
-                contentDescription = flameDesc,
-                modifier = GlanceModifier.size(28.dp, 36.dp)
+            Spacer(GlanceModifier.height(3.dp))
+            Text(
+                text = name,
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = textPrimary
+                ),
+                maxLines = 1,
+                modifier = GlanceModifier.defaultWeight()
             )
         }
-    }
-}
-
-@Composable
-private fun MediumLayout(
-    bgDrawable: Int,
-    avatarBitmap: android.graphics.Bitmap?,
-    name: String,
-    flameIcon: Int,
-    flameDesc: String,
-    streak: Int,
-    dailyDone: Boolean
-) {
-    Row(
-        modifier = GlanceModifier.fillMaxSize()
-            .background(ImageProvider(bgDrawable))
-            .padding(12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        if (avatarBitmap != null) {
-            Image(
-                provider = ImageProvider(avatarBitmap),
-                contentDescription = "Avatar",
-                modifier = GlanceModifier.size(48.dp).cornerRadius(24.dp)
-            )
-        } else {
-            Box(
-                modifier = GlanceModifier.size(48.dp)
-                    .background(Color(0xFF9E9E9E))
-                    .cornerRadius(24.dp)
-            ) {}
-        }
-        Spacer(GlanceModifier.width(12.dp))
-        Text(
-            text = name,
-            style = TextStyle(
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = textPrimary
-            ),
-            maxLines = 1,
-            modifier = GlanceModifier.defaultWeight()
-        )
+        Spacer(GlanceModifier.defaultWeight())
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
                 provider = ImageProvider(flameIcon),
                 contentDescription = flameDesc,
-                modifier = GlanceModifier.size(24.dp, 32.dp)
+                modifier = GlanceModifier.size(130.dp)
             )
+            Spacer(GlanceModifier.height(1.dp))
             Text(
                 text = "$streak",
                 style = TextStyle(
@@ -231,28 +283,40 @@ private fun LargeLayout(
             maxLines = 2
         )
 
-        Spacer(GlanceModifier.defaultWeight())
+        Spacer(GlanceModifier.height(8.dp))
+        Text(
+            text = "$streak",
+            style = TextStyle(
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (dailyDone) streakActive else streakInactive
+            )
+        )
+        Image(
+            provider = ImageProvider(flameIcon),
+            contentDescription = flameDesc,
+            modifier = GlanceModifier.size(300.dp)
+        )
 
         // Bottom: Flame + Streak centered
-        Column(
-            modifier = GlanceModifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                provider = ImageProvider(flameIcon),
-                contentDescription = flameDesc,
-                modifier = GlanceModifier.size(32.dp, 42.dp)
-            )
-            Spacer(GlanceModifier.height(2.dp))
-            Text(
-                text = "$streak",
-                style = TextStyle(
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (dailyDone) streakActive else streakInactive
-                )
-            )
-        }
+//        Column(
+//            modifier = GlanceModifier.fillMaxWidth(),
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            Text(
+//                text = "$streak",
+//                style = TextStyle(
+//                    fontSize = 20.sp,
+//                    fontWeight = FontWeight.Bold,
+//                    color = if (dailyDone) streakActive else streakInactive
+//                )
+//            )
+//            Image(
+//                provider = ImageProvider(flameIcon),
+//                contentDescription = flameDesc,
+//                modifier = GlanceModifier.size(300.dp)
+//            )
+//        }
     }
 }
 
