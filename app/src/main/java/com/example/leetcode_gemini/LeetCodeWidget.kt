@@ -279,14 +279,24 @@ private fun LargeLayout(
         )
 
         Spacer(GlanceModifier.height(8.dp))
-        Text(
-            text = "$streak",
-            style = TextStyle(
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = if (dailyDone) streakActive else streakInactive
+        Row() {
+            Text(
+                text = "$streak",
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (dailyDone) streakActive else streakInactive
+                )
             )
-        )
+            Text(
+                text = "  current streak",
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (dailyDone) streakActive else streakInactive
+                )
+            )
+        }
         Image(
             provider = ImageProvider(flameIcon),
             contentDescription = flameDesc,
