@@ -41,6 +41,11 @@ class UpdateWorker(context: Context, params: WorkerParameters) : CoroutineWorker
               recentAcSubmissionList(username: ${'$'}username, limit: 5) {
                 titleSlug
               }
+              streakCounter(username: ${'$'}username) {
+                streakCount
+                daysSkipped
+                currentDayCompleted
+              }
             }
         """.trimIndent()
 
@@ -55,16 +60,17 @@ class UpdateWorker(context: Context, params: WorkerParameters) : CoroutineWorker
                 putString("daily_title", response.data.activeDailyCodingChallengeQuestion?.question?.title ?: "No Challenge")
                 putString("raw_json", jsonResponse)
                 // Simplified "streak" as total solved for this example
-                putInt("streak", user?.submitStats?.acSubmissionNum?.firstOrNull { it.difficulty == "All" }?.count ?: 0)
-
-                val dailySlug = response.data.activeDailyCodingChallengeQuestion?.question?.titleSlug
-                val isSolved = response.data.recentAcSubmissionList.any { it.titleSlug == dailySlug }
-
-                if (isSolved) {
-                    putBoolean("daily_solved", true)
-                } else {
-                    putBoolean("daily_solved", false)
-                }
+                putInt("totalSubmission", user?.submitStats?.acSubmissionNum?.firstOrNull { it.difficulty == "All" }?.count ?: 0)
+                putInt("streak",response.data.streakCounter?.streakCount ?: 0)
+//                val dailySlug = response.data.activeDailyCodingChallengeQuestion?.question?.titleSlug
+//                val isSolved = response.data.recentAcSubmissionList.any { it.titleSlug == dailySlug }
+//
+//                if (isSolved) {
+//                    putBoolean("daily_solved", true)
+//                } else {
+//                    putBoolean("daily_solved", false)
+//                }
+                putBoolean("daily_solved", response.data.streakCounter?.currentDayCompleted ?: false)
                 apply()
             }
             val avatarUrl = user?.profile?.userAvatar ?: ""

@@ -9,10 +9,16 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.*
+import androidx.glance.action.ActionParameters
+import androidx.glance.action.clickable
 import androidx.glance.appwidget.*
+import androidx.glance.appwidget.action.ActionCallback
+import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.layout.*
 import androidx.glance.text.*
 import androidx.glance.unit.ColorProvider
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import java.io.File
 
 // Text colors — day/night resolved via resource qualifiers (values/ vs values-night/)
@@ -26,6 +32,21 @@ private val textLabel = ColorProvider(R.color.widget_text_label)
 private val streakActive = ColorProvider(R.color.widget_streak_active)
 @SuppressLint("RestrictedApi")
 private val streakInactive = ColorProvider(R.color.widget_streak_inactive)
+
+class RefreshActionCallback : ActionCallback {
+    override suspend fun onAction(
+        context: Context,
+        glanceId: GlanceId,
+        parameters: ActionParameters
+    ) {
+        // 1. Manually trigger a one-time sync immediately
+        val workRequest = OneTimeWorkRequestBuilder<UpdateWorker>().build()
+        WorkManager.getInstance(context).enqueue(workRequest)
+
+        // Note: The widget will update itself once the UpdateWorker
+        // calls LeetCodeWidget().updateAll(context) at the end of its task.
+    }
+}
 
 class LeetCodeWidget : GlanceAppWidget() {
 
@@ -46,12 +67,14 @@ class LeetCodeWidget : GlanceAppWidget() {
         }
 
         val bgDrawable = if (dailyDone) R.drawable.widget_bg_completed else R.drawable.widget_bg_pending
-        val flameIcon = if (dailyDone) R.drawable.new_fire2 else R.drawable.fire_non_animated_dim
+        val flameIcon = if (dailyDone) R.drawable.fire3 else R.drawable.fire_non_animated_dim
         val flameDesc = if (dailyDone) "Daily completed" else "Daily pending"
 
         provideContent {
             val size = LocalSize.current
-            Box(modifier = GlanceModifier.fillMaxSize()) {
+            Box(modifier = GlanceModifier.fillMaxSize()
+                .clickable(actionRunCallback<RefreshActionCallback>())
+            ) {
                 if (size.width >= 250.dp && size.height >= 250.dp) {
                     LargeLayout(bgDrawable, avatarBitmap, name, daily, flameIcon, flameDesc, streak, dailyDone)
                 } else {
@@ -172,7 +195,7 @@ private fun CompactLayout(
             Image(
                 provider = ImageProvider(flameIcon),
                 contentDescription = flameDesc,
-                modifier = GlanceModifier.size(iconSize)
+                modifier = GlanceModifier.size(iconSize+10.dp)
             )
             if (tall) {
                 Spacer(GlanceModifier.height(4.dp))
