@@ -10,11 +10,15 @@ import java.util.concurrent.TimeUnit
 
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        // We only care about the boot completed action
-        if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
+        val action = intent.action ?: return
 
-            // Re-register the periodic work that was lost on reboot
-            val periodicRequest = PeriodicWorkRequestBuilder<UpdateWorker>(15, TimeUnit.MINUTES)
+        if (action == Intent.ACTION_BOOT_COMPLETED ||
+            action == "android.intent.action.QUICKBOOT_POWERON") {
+            val prefs = context.getSharedPreferences("leetcode_prefs", Context.MODE_PRIVATE)
+            val gapHours = prefs.getFloat("sampling_gap_hours", 1f)
+            val intervalMinutes = (gapHours * 60).toLong().coerceAtLeast(15)
+
+            val periodicRequest = PeriodicWorkRequestBuilder<UpdateWorker>(intervalMinutes, TimeUnit.MINUTES)
                 .build()
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
@@ -23,5 +27,7 @@ class BootReceiver : BroadcastReceiver() {
                 periodicRequest
             )
         }
+
+        ReminderAlarmScheduler.scheduleIfEnabled(context)
     }
 }

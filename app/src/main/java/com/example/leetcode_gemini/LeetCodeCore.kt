@@ -11,7 +11,7 @@ data class DataContent(
     val recentAcSubmissionList: List<SlugData>,
     val streakCounter: StreakData?
 )
-data class DailyQuestion(val question: QuestionDetails)
+data class DailyQuestion(val link: String, val question: QuestionDetails)
 data class QuestionDetails(val title: String, val titleSlug: String)
 data class UserProfile(val profile: ProfileDetails, val submitStats: Stats)
 data class ProfileDetails(val userAvatar: String, val realName: String)

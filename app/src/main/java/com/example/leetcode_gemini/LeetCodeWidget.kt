@@ -2,7 +2,9 @@ package com.example.leetcode_gemini
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.graphics.BitmapFactory
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpSize
@@ -10,16 +12,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.*
 import androidx.glance.action.ActionParameters
+import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.*
 import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.action.actionRunCallback
+import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.layout.*
 import androidx.glance.text.*
 import androidx.glance.unit.ColorProvider
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import java.io.File
+import androidx.core.net.toUri
 
 // Text colors — day/night resolved via resource qualifiers (values/ vs values-night/)
 @SuppressLint("RestrictedApi")
@@ -180,6 +185,11 @@ private fun CompactLayout(
                         fontWeight = if (tall) FontWeight.Medium else FontWeight.Normal,
                         color = textSecondary
                     ),
+                    modifier = GlanceModifier.clickable(
+                        actionStartActivity(
+                            Intent(Intent.ACTION_VIEW, "https://leetcode.com".toUri())
+                        )
+                    ),
                     maxLines = if (tall) 2 else 1
                 )
             }
@@ -275,7 +285,12 @@ private fun LargeLayout(
                 fontSize = 14.sp,
                 color = textSecondary
             ),
-            maxLines = 2
+            maxLines = 2,
+            modifier = GlanceModifier.clickable(
+                actionStartActivity(
+                    Intent(Intent.ACTION_VIEW, "https://leetcode.com".toUri())
+                )
+            ),
         )
 
         Spacer(GlanceModifier.height(8.dp))

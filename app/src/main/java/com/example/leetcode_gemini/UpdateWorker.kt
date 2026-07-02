@@ -29,6 +29,7 @@ class UpdateWorker(context: Context, params: WorkerParameters) : CoroutineWorker
         val queryStr = """
             query getWidgetData(${"$"}username: String!) {
               activeDailyCodingChallengeQuestion {
+                  link
                   question {
                     title
                     titleSlug
@@ -53,6 +54,7 @@ class UpdateWorker(context: Context, params: WorkerParameters) : CoroutineWorker
             val response = api.getData(GraphQLQuery(queryStr, mapOf("username" to username)))
             val user = response.data.matchedUser
             val jsonResponse = Gson().toJson(response)
+            var dailyUrl = "https://leetcode.com" + (response.data.activeDailyCodingChallengeQuestion?.link ?: "")
 
             prefs.edit().apply {
                 putString("real_name", user?.profile?.realName ?: "Unknown")
@@ -71,6 +73,7 @@ class UpdateWorker(context: Context, params: WorkerParameters) : CoroutineWorker
 //                    putBoolean("daily_solved", false)
 //                }
                 putBoolean("daily_solved", response.data.streakCounter?.currentDayCompleted ?: false)
+                putString("problem_link", dailyUrl)
                 apply()
             }
             val avatarUrl = user?.profile?.userAvatar ?: ""
