@@ -45,13 +45,13 @@ class ReminderReceiver : BroadcastReceiver() {
 
     private fun showNotification(context: Context, prefs: android.content.SharedPreferences) {
         val dailyTitle = prefs.getString("daily_title", "today's challenge") ?: "today's challenge"
-        val problemLink = prefs.getString("daily_title", "https://leetcode.com") ?: "https://leetcode.com"
-        val tapIntent = Intent(Intent.ACTION_VIEW, problemLink.toUri()).apply {
+        val problemLink = prefs.getString("problem_link", "https://leetcode.com") ?: "https://leetcode.com"
+        val browserIntent = Intent(Intent.ACTION_VIEW, problemLink.toUri()).apply {
             // Flags to ensure smooth browser launching behavior
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
         val tapPendingIntent = PendingIntent.getActivity(
-            context, 0, tapIntent,
+            context, 0, browserIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 

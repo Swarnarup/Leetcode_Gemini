@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -173,6 +174,11 @@ class MainActivity : ComponentActivity() {
                 Text(
                     text = statusText,
                     style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier
+                        // 1. Confine the height so it knows when to start scrolling
+                        .heightIn(max = 200.dp)
+                        // 2. Add the scroll behavior
+                        .verticalScroll(rememberScrollState())
                 )
 
                 Spacer(Modifier.height(24.dp))
