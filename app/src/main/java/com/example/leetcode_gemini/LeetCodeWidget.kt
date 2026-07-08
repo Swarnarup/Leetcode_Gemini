@@ -63,6 +63,7 @@ class LeetCodeWidget : GlanceAppWidget() {
         val daily = prefs.getString("daily_title", "Loading...") ?: "Loading..."
         val streak = prefs.getInt("streak", 0)
         val dailyDone = prefs.getBoolean("daily_solved", false)
+        val dLink = prefs.getString("problem_link", "https://leetcode.com/") ?: "https://leetcode.com/"
 
         val avatarFile = File(context.filesDir, "avatar.png")
         val avatarBitmap = if (avatarFile.exists()) {
@@ -81,9 +82,9 @@ class LeetCodeWidget : GlanceAppWidget() {
                 .clickable(actionRunCallback<RefreshActionCallback>())
             ) {
                 if (size.width >= 250.dp && size.height >= 250.dp) {
-                    LargeLayout(bgDrawable, avatarBitmap, name, daily, flameIcon, flameDesc, streak, dailyDone)
+                    LargeLayout(bgDrawable, avatarBitmap, name, daily, flameIcon, flameDesc, streak, dailyDone, dLink)
                 } else {
-                    CompactLayout(size, bgDrawable, avatarBitmap, name, daily, flameIcon, flameDesc, streak, dailyDone)
+                    CompactLayout(size, bgDrawable, avatarBitmap, name, daily, flameIcon, flameDesc, streak, dailyDone, dLink)
                 }
                 Box(
                     modifier = GlanceModifier.fillMaxSize().padding(bottom = 2.dp),
@@ -111,7 +112,8 @@ private fun CompactLayout(
     flameIcon: Int,
     flameDesc: String,
     streak: Int,
-    dailyDone: Boolean
+    dailyDone: Boolean,
+    dailyLink: String
 ) {
     val wide = size.width >= 200.dp
     val tall = size.height >= 130.dp
@@ -187,7 +189,7 @@ private fun CompactLayout(
                     ),
                     modifier = GlanceModifier.clickable(
                         actionStartActivity(
-                            Intent(Intent.ACTION_VIEW, "https://leetcode.com".toUri())
+                            Intent(Intent.ACTION_VIEW, dailyLink.toUri())
                         )
                     ),
                     maxLines = if (tall) 2 else 1
@@ -233,7 +235,8 @@ private fun LargeLayout(
     flameIcon: Int,
     flameDesc: String,
     streak: Int,
-    dailyDone: Boolean
+    dailyDone: Boolean,
+    dailyLink: String
 ) {
     Column(
         modifier = GlanceModifier.fillMaxSize()
@@ -288,7 +291,7 @@ private fun LargeLayout(
             maxLines = 2,
             modifier = GlanceModifier.clickable(
                 actionStartActivity(
-                    Intent(Intent.ACTION_VIEW, "https://leetcode.com".toUri())
+                    Intent(Intent.ACTION_VIEW, dailyLink.toUri())
                 )
             ),
         )

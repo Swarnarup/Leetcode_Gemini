@@ -54,7 +54,7 @@ class UpdateWorker(context: Context, params: WorkerParameters) : CoroutineWorker
             val response = api.getData(GraphQLQuery(queryStr, mapOf("username" to username)))
             val user = response.data.matchedUser
             val jsonResponse = Gson().toJson(response)
-            var dailyUrl = "https://leetcode.com" + (response.data.activeDailyCodingChallengeQuestion?.link ?: "")
+            var dailyUrl = "https://leetcode.com" + (response.data.activeDailyCodingChallengeQuestion?.link ?: "/")
 
             prefs.edit().apply {
                 putString("real_name", user?.profile?.realName ?: "Unknown")
